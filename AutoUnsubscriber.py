@@ -85,7 +85,7 @@ class AutoUnsubscriber():
     '''
     def getEmails(self):
         print('Getting emails with unsubscribe in the body\n')
-        UIDs = self.imap.search(['BODY unsubscribe']) 
+        UIDs = self.imap.search([u'TEXT','unsubscribe'])
         raw = self.imap.fetch(UIDs, ['BODY[]'])
         print('Getting links and addresses\n')
         for UID in UIDs:
@@ -176,7 +176,7 @@ class AutoUnsubscriber():
                     break
                 else:
                     print('Invalid choice, please enter \'Y\' or \'N\'.\n')
-            while True:
+          '''while True:
                 delete = input('Delete emails from '+str(self.senderList[j][1])+' (Y/N): ')
                 d = choice(delete)
                 if d:
@@ -187,6 +187,7 @@ class AutoUnsubscriber():
                     break
                 else:
                     print('Invalid choice, please enter \'Y\' or \'N\'.\n')
+            '''
     '''Navigate to selected unsubscribe, 10 at a time'''
     def openLinks(self):
         if self.goToLinks != True:
@@ -220,7 +221,7 @@ class AutoUnsubscriber():
                     print('Searching for emails to delete from '+str(self.senderList[i][1]))
                     fromSender = 'FROM '+str(self.senderList[i][1])
                     '''Search for unsubscribe in body from selected providers'''
-                    DelUIDs = self.imap.search(['BODY unsubscribe', fromSender])
+                    DelUIDs = self.imap.search(['TEXT','unsubscribe', fromSender])
                     DelCount = 0
                     for DelUID in DelUIDs:
                         '''Delete emails from selected providers'''
