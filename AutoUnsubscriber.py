@@ -176,7 +176,7 @@ class AutoUnsubscriber():
                     break
                 else:
                     print('Invalid choice, please enter \'Y\' or \'N\'.\n')
-          while True:
+            while True:
                 delete = input('Delete emails from '+str(self.senderList[j][1])+' (Y/N): ')
                 d = choice(delete)
                 if d:
