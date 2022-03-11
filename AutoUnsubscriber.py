@@ -13,14 +13,13 @@ servers = [('Gmail','imap.gmail.com'),('Outlook','imap-mail.outlook.com'),
            ('Hotmail','imap-mail.outlook.com'),('Yahoo','imap.mail.yahoo.com'),
            ('ATT','imap.mail.att.net'),('Comcast','imap.comcast.net'),
            ('Verizon','incoming.verizon.net'),('AOL','imap.aol.com'),
-           ('Zoho','imap.zoho.com')]
+           ('Zoho','imap.zoho.com'),('GMX','imap.gmx.com')]
 
 #add to words if more words found
 '''Key words for unsubscribe link - add more if found'''
 words = ['unsubscribe','subscription','optout']
 
 class AutoUnsubscriber():
-
     def __init__(self):
         self.email = ''
         self.user = None
@@ -40,8 +39,8 @@ class AutoUnsubscriber():
     '''Get initial user info - email, password, and service provider'''
     def getInfo(self):
         print('This program searchs your email for junk mail to unsubscribe from and delete')
-        print('Suported emails: Gmail, Outlook, Hotmail, Yahoo, AOL, Zoho,')
-        print('AT&T, Comcast, and Verizon')
+        print('Supported emails: Gmail, Outlook, Hotmail, Yahoo, AOL, Zoho,')
+        print('GMX, AT&T, Comcast, and Verizon')
         print('Please note: you may need to allow access to less secure apps')
         getEmail = True
         while getEmail:
@@ -54,6 +53,13 @@ class AutoUnsubscriber():
                     getEmail = False
                     break
             if self.user == None:
+                print('\nEmail type not recognized, enter an imap server, or press enter to try a different email address:\n')
+                myimap = input('\n[myimapserver.tld] | [enter] : ')
+                if myimap:
+                    self.user = ('Self-defined IMAP', myimap)
+                    print('\nYou are using a'+self.user[0]+' account!\n')
+                    getEmail = False
+                    break
                 print('\nNo useable email type detected, try a different account')
         self.password = getpass.getpass('Enter password for '+self.email+': ')
 
