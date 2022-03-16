@@ -7,13 +7,14 @@ import getpass
 import webbrowser
 import re
 import sys
+import ssl
 
 '''List of accepted service providers and respective imap link'''
 servers = [('Gmail','imap.gmail.com'),('Outlook','imap-mail.outlook.com'),
            ('Hotmail','imap-mail.outlook.com'),('Yahoo','imap.mail.yahoo.com'),
            ('ATT','imap.mail.att.net'),('Comcast','imap.comcast.net'),
            ('Verizon','incoming.verizon.net'),('AOL','imap.aol.com'),
-           ('Zoho','imap.zoho.com'),('GMX','imap.gmx.com')]
+           ('Zoho','imap.zoho.com'),('GMX','imap.gmx.com'),('ProtonMail','127.0.0.1')]
 
 #add to words if more words found
 '''Key words for unsubscribe link - add more if found'''
@@ -40,7 +41,7 @@ class AutoUnsubscriber():
     def getInfo(self):
         print('This program searchs your email for junk mail to unsubscribe from and delete')
         print('Supported emails: Gmail, Outlook, Hotmail, Yahoo, AOL, Zoho,')
-        print('GMX, AT&T, Comcast, and Verizon')
+        print('GMX, AT&T, Comcast, ProtonMail (Bridge), and Verizon')
         print('Please note: you may need to allow access to less secure apps')
         getEmail = True
         while getEmail:
@@ -66,8 +67,16 @@ class AutoUnsubscriber():
     '''Log in to IMAP server, argument determines whether readonly or not'''
     def login(self, read=True):
         try: 
-            self.imap = imapclient.IMAPClient(self.user[1], ssl=True)
-            #self.imap._MAXLINE = 10000000
+            '''ProtonMail Bridge Support - Requires unverified STARTTLS and changing ports'''
+            if self.user[0]=='ProtonMail':
+                print("\nProtonMail require ProtonMail Bridge installed, make sure you've used the password Bridge gives you.")
+                self.context = ssl.create_default_context()
+                self.context.check_hostname = False
+                self.context.verify_mode = ssl.CERT_NONE
+                self.imap = imapclient.IMAPClient(self.user[1], port=1143, ssl=False)
+                self.imap.starttls(ssl_context=self.context)
+            else: self.imap = imapclient.IMAPClient(self.user[1], ssl=True)
+            self.imap._MAXLINE = 10000000
             self.imap.login(self.email, self.password)
             self.imap.select_folder('INBOX', readonly=read)
             print('\nLog in successful\n')
