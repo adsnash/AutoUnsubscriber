@@ -67,7 +67,7 @@ class AutoUnsubscriber():
     def login(self, read=True):
         try: 
             self.imap = imapclient.IMAPClient(self.user[1], ssl=True)
-            self.imap._MAXLINE = 10000000
+            #self.imap._MAXLINE = 10000000
             self.imap.login(self.email, self.password)
             self.imap.select_folder('INBOX', readonly=read)
             print('\nLog in successful\n')
@@ -95,8 +95,12 @@ class AutoUnsubscriber():
         raw = self.imap.fetch(UIDs, ['BODY[]'])
         print('Getting links and addresses\n')
         for UID in UIDs:
-            '''Get address and check if sender already in senderList'''
-            msg = pyzmail.PyzMessage.factory(raw[UID][b'BODY[]'])
+            '''If Body exists (resolves weird error with no body emails from Yahoo), then
+            Get address and check if sender already in senderList '''
+            if b'BODY[]' in raw[UID]: msg = pyzmail.PyzMessage.factory(raw[UID][b'BODY[]'])
+            else:
+                print("Odd Email at UID: "+str(UID)+"; SKIPPING....")
+                continue
             sender = msg.get_addresses('from')
             trySender = True
             for spammers in self.senderList:
