@@ -225,7 +225,7 @@ class AutoUnsubscriber():
                 if self.senderList[i][4] == True:
                     sender=str(self.senderList[i][1])
                     print('Searching for emails to delete from '+sender)
-                    '''Search for unsubscribe in body from selected providers'''
+                    '''Search for UID from selected providers'''
                     DelUIDs = self.imap.search([u'FROM', sender])
                     DelCount = 0
                     for DelUID in DelUIDs:
