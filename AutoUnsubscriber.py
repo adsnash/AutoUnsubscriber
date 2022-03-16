@@ -57,7 +57,7 @@ class AutoUnsubscriber():
                 myimap = input('\n[myimapserver.tld] | [enter] : ')
                 if myimap:
                     self.user = ('Self-defined IMAP', myimap)
-                    print('\nYou are using a'+self.user[0]+' account!\n')
+                    print('\nYou are using a '+self.user[0]+' account!\n')
                     getEmail = False
                     break
                 print('\nNo useable email type detected, try a different account')
@@ -223,10 +223,10 @@ class AutoUnsubscriber():
             DelTotal = 0
             for i in range(len(self.senderList)):
                 if self.senderList[i][4] == True:
-                    print('Searching for emails to delete from '+str(self.senderList[i][1]))
-                    fromSender = 'FROM '+str(self.senderList[i][1])
+                    sender=str(self.senderList[i][1])
+                    print('Searching for emails to delete from '+sender)
                     '''Search for unsubscribe in body from selected providers'''
-                    DelUIDs = self.imap.search(['TEXT','unsubscribe', fromSender])
+                    DelUIDs = self.imap.search([u'FROM', sender])
                     DelCount = 0
                     for DelUID in DelUIDs:
                         '''Delete emails from selected providers'''
