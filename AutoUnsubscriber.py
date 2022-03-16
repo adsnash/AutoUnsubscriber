@@ -57,7 +57,7 @@ class AutoUnsubscriber():
                 myimap = input('\n[myimapserver.tld] | [enter] : ')
                 if myimap:
                     self.user = ('Self-defined IMAP', myimap)
-                    print('\nYou are using a'+self.user[0]+' account!\n')
+                    print('\nYou are using a '+self.user[0]+' account!\n')
                     getEmail = False
                     break
                 print('\nNo useable email type detected, try a different account')
@@ -67,7 +67,7 @@ class AutoUnsubscriber():
     def login(self, read=True):
         try: 
             self.imap = imapclient.IMAPClient(self.user[1], ssl=True)
-            self.imap._MAXLINE = 10000000
+            #self.imap._MAXLINE = 10000000
             self.imap.login(self.email, self.password)
             self.imap.select_folder('INBOX', readonly=read)
             print('\nLog in successful\n')
@@ -95,8 +95,12 @@ class AutoUnsubscriber():
         raw = self.imap.fetch(UIDs, ['BODY[]'])
         print('Getting links and addresses\n')
         for UID in UIDs:
-            '''Get address and check if sender already in senderList'''
-            msg = pyzmail.PyzMessage.factory(raw[UID][b'BODY[]'])
+            '''If Body exists (resolves weird error with no body emails from Yahoo), then
+            Get address and check if sender already in senderList '''
+            if b'BODY[]' in raw[UID]: msg = pyzmail.PyzMessage.factory(raw[UID][b'BODY[]'])
+            else:
+                print("Odd Email at UID: "+str(UID)+"; SKIPPING....")
+                continue
             sender = msg.get_addresses('from')
             trySender = True
             for spammers in self.senderList:
@@ -210,8 +214,8 @@ class AutoUnsubscriber():
                         counter = 0
 
     '''Log back into IMAP servers, NOT in readonly mode, and delete emails from
-    selected providers. Note: only deleting emails with unsubscribe in the body.
-    Emails from provider without unsubscribe in the body will not be deleted.
+    selected providers. Note: Deletes all emails from unsubscribed sender.
+    Emails from provider without unsubscribe in the body will be deleted.
     '''
     def deleteEmails(self):
         if self.delEmails != True:
@@ -223,10 +227,10 @@ class AutoUnsubscriber():
             DelTotal = 0
             for i in range(len(self.senderList)):
                 if self.senderList[i][4] == True:
-                    print('Searching for emails to delete from '+str(self.senderList[i][1]))
-                    fromSender = 'FROM '+str(self.senderList[i][1])
-                    '''Search for unsubscribe in body from selected providers'''
-                    DelUIDs = self.imap.search(['TEXT','unsubscribe', fromSender])
+                    sender=str(self.senderList[i][1])
+                    print('Searching for emails to delete from '+sender)
+                    '''Search for UID from selected providers'''
+                    DelUIDs = self.imap.search([u'FROM', sender])
                     DelCount = 0
                     for DelUID in DelUIDs:
                         '''Delete emails from selected providers'''
