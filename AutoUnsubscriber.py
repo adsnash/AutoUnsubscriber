@@ -210,8 +210,8 @@ class AutoUnsubscriber():
                         counter = 0
 
     '''Log back into IMAP servers, NOT in readonly mode, and delete emails from
-    selected providers. Note: only deleting emails with unsubscribe in the body.
-    Emails from provider without unsubscribe in the body will not be deleted.
+    selected providers. Note: Deletes all emails from unsubscribed sender.
+    Emails from provider without unsubscribe in the body will be deleted.
     '''
     def deleteEmails(self):
         if self.delEmails != True:
