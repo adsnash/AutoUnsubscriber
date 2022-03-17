@@ -15,8 +15,51 @@ servers = [('Gmail','imap.gmail.com'),('Outlook','imap-mail.outlook.com'),
            ('ATT','imap.mail.att.net'),('Comcast','imap.comcast.net'),
            ('Verizon','incoming.verizon.net'),('AOL','imap.aol.com'),
            ('Zoho','imap.zoho.com'),('GMX','imap.gmx.com'),('ProtonMail','127.0.0.1')]
+#Rewrote with dictionaries
+serverD = {
+    'Gmail': {
+        'imap': 'imap.gmail.com',
+        'domains': ['@gmail.com']
+        },
+    'Outlook/Hotmail': {
+        'imap': 'imap-mail.outlook.com',
+        'domains': ['@outlook.com','@hotmail.com']
+        },
+    'Yahoo': {
+        'imap': 'imap.mail.yahoo.com',
+        'domains': ['@yahoo.com']
+        },
+    'ATT': {
+        'imap': 'imap.mail.att.net',
+        'domains': ['@att.net']
+        },
+    'Comcast': {
+        'imap': 'imap.comcast.net',
+        'domains': ['@comcast.net']
+        },
+    'Verizon': {
+        'imap': 'incoming.verizon.net',
+        'domains': ['@verizon.net']
+        },
+    'AOL': {
+        'imap': 'imap.aol.com',
+        'domains': ['@aol.com']
+        },
+    'Zoho': {
+        'imap': 'imap.zoho.com',
+        'domains': ['@zoho.com']
+        },
+    'GMX': {
+        'imap': 'imap.gmx.com',
+        'domains': ['@gmx.com']
+        },
+    'ProtonMail': {
+        'imap': '127.0.0.1',
+        'domains': ['@protonmail.com','@pm.me']
+    }
+}
 
-#add to words if more words found
+
 '''Key words for unsubscribe link - add more if found'''
 words = ['unsubscribe','subscription','optout']
 
@@ -30,15 +73,12 @@ class AutoUnsubscriber():
         self.delEmails = False
         self.senderList = []
         self.noLinkList = []
-        self.wordCheck = []
         self.providers = []
         #server name is later matched against second level domain names
         for server in servers:
             self.providers.append(re.compile(server[0], re.I))
         #TODO maybe add support for servers with a
         #company name different than their domain name...
-        for i in words:
-            self.wordCheck.append(re.compile(i, re.I))
     '''Get initial user info - email, password, and service provider'''
     def getInfo(self):
         print('This program searchs your email for junk mail to unsubscribe from and delete')
@@ -47,15 +87,18 @@ class AutoUnsubscriber():
         print('Please note: you may need to allow access to less secure apps')
         getEmail = True
         while getEmail:
-            self.email = input('\nEnter your email address: ')
-            for provider in self.providers):
-                choice = provider.search(self.email)
-                if choice != None:
-                    self.user = servers[j]
-                    print('\nLooks like you\'re using a '+self.user[0]+' account\n')
-                    getEmail = False
-                    break
-            if self.user == None:
+            self.email = str.lower(input('\nEnter your email address: '))
+            for prov in serverD:
+                match=False
+                for domain in serverD[prov]['domains']:
+                    if domain in self.email:
+                        print('\nLooks like you\'re using a '+prov+' account\n')
+                        self.user = (prov, serverD[prov]['imap'])
+                        getEmail = False
+                        match = True
+                        break
+                if match: break
+            if self.user is None:
                 print('\nEmail type not recognized, enter an imap server, or press enter to try a different email address:\n')
                 myimap = input('\n[myimapserver.tld] | [enter] : ')
                 if myimap:
@@ -63,7 +106,7 @@ class AutoUnsubscriber():
                     print('\nYou are using a '+self.user[0]+' account!\n')
                     getEmail = False
                     break
-                print('\nNo useable email type detected, try a different account')
+                print('\nTry a different account')
         self.password = getpass.getpass('Enter password for '+self.email+': ')
 
     '''Log in to IMAP server, argument determines whether readonly or not'''
@@ -128,27 +171,26 @@ class AutoUnsubscriber():
                 print('Searching for unsubscribe link from '+str(senderName))
                 url = False
                 '''Parse html for elements with anchor tags'''
-                if msg.html_part != None:
-                    html = msg.html_part.get_payload().decode('utf-8')
+                if html_piece := msg.html_part:
+                    html = html_piece.get_payload().decode('utf-8')
                     soup = bs4.BeautifulSoup(html, 'html.parser')
                     elems = soup.select('a')
                     '''For each anchor tag, use regex to search for key words'''
+                    elems.reverse()
+                    #search starting at the bottom of email
                     for elem in elems:
-                        for word in self.wordCheck:
-                            k = word.search(elem)
+                        for word in self.words:
                             '''If one is found, get the url'''
-                            if k != None:
+                            if re.match( word, str(elem), re.IGNORECASE):
                                 print('Link found')
                                 url = elem.get('href')
                                 break
-                        if url != False:
-                            break
+                        if url: break
                 '''If link found, add info to senderList
                 format: (Name, email, link, go to link, delete emails)
                 If no link found, add to noLinkList
                 '''
-                if url != False:
-                    self.senderList.append([senderName, sender[0][1], url, False, False])
+                if url: self.senderList.append([senderName, sender[0][1], url, False, False])
                 else:
                     print('No link found')
                     notInList = True
@@ -298,7 +340,7 @@ class AutoUnsubscriber():
     def fullProcess(self):
         self.accessServer()
         self.getEmails()
-        if self.senderList != []:
+        if self.senderList:
             self.decisions()
             self.openLinks()
             self.deleteEmails()
