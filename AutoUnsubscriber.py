@@ -32,11 +32,13 @@ class AutoUnsubscriber():
         self.noLinkList = []
         self.wordCheck = []
         self.providers = []
-        for i in range(len(servers)):
-            self.providers.append(re.compile(servers[i][0], re.I))
-        for i in range(len(words)):
-            self.wordCheck.append(re.compile(words[i], re.I))
-
+        #server name is later matched against second level domain names
+        for server in servers:
+            self.providers.append(re.compile(server[0], re.I))
+        #TODO maybe add support for servers with a
+        #company name different than their domain name...
+        for i in words:
+            self.wordCheck.append(re.compile(i, re.I))
     '''Get initial user info - email, password, and service provider'''
     def getInfo(self):
         print('This program searchs your email for junk mail to unsubscribe from and delete')
@@ -46,8 +48,8 @@ class AutoUnsubscriber():
         getEmail = True
         while getEmail:
             self.email = input('\nEnter your email address: ')
-            for j in range(len(self.providers)):
-                choice = self.providers[j].search(self.email)
+            for provider in self.providers):
+                choice = provider.search(self.email)
                 if choice != None:
                     self.user = servers[j]
                     print('\nLooks like you\'re using a '+self.user[0]+' account\n')
@@ -131,13 +133,13 @@ class AutoUnsubscriber():
                     soup = bs4.BeautifulSoup(html, 'html.parser')
                     elems = soup.select('a')
                     '''For each anchor tag, use regex to search for key words'''
-                    for i in range(len(elems)):
-                        for j in range(len(self.wordCheck)):
-                            k = self.wordCheck[j].search(str(elems[i]))
+                    for elem in elems:
+                        for word in self.wordCheck:
+                            k = word.search(elem)
                             '''If one is found, get the url'''
                             if k != None:
                                 print('Link found')
-                                url = elems[i].get('href')
+                                url = elem.get('href')
                                 break
                         if url != False:
                             break
