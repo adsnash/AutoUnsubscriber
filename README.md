@@ -1,3 +1,5 @@
+### AutoUnsubscriber
+
 This program is an email auto-unsubscriber. Depending on your email provider and settings, it may require you to allow access to less secure apps.
 
 It uses IMAP to log into your email. From there, it goes through every email with "unsubscribe" in the body, parses the HTML, and uses regex to search through anchor tags for keywords that indicate an unsubscribe link (unsubscribe, optout, etc). If it finds a match, it grabs the href link and puts the address and link in a list.
