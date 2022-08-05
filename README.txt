@@ -5,3 +5,18 @@ It uses IMAP to log into your email. From there, it goes through every email wit
 After the program has a list of emails and links, for each address in the list, it gives the user the option to navigate to the unsubscribe link and to delete emails with unsubscribe in the body from the sender. 
 
 Once the program finishes going through the list, it gives the user the option to run the program again on the same email address, run it on a different email address, or quit the program.
+
+------
+# Python package Installation
+
+'''
+pip install getpass4
+pip install bs4
+pip install IMAPclient
+pip install regex
+pip install os-sys
+pip install syspath
+pip install pyopenssl
+pip install pyzmail
+pip install pyzmail35
+'''
