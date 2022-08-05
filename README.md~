@@ -7,9 +7,9 @@ After the program has a list of emails and links, for each address in the list, 
 Once the program finishes going through the list, it gives the user the option to run the program again on the same email address, run it on a different email address, or quit the program.
 
 ------
-### Python package Installation
+# Python package Installation
 
-`
+'''
 pip install getpass4
 pip install bs4
 pip install IMAPclient
@@ -19,4 +19,4 @@ pip install syspath
 pip install pyopenssl
 pip install pyzmail
 pip install pyzmail35
-`
+'''
