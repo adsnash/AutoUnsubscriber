@@ -9,7 +9,7 @@ Once the program finishes going through the list, it gives the user the option t
 ------
 ### Python package Installation
 
-`
+```
 pip install getpass4
 pip install bs4
 pip install IMAPclient
@@ -19,4 +19,7 @@ pip install syspath
 pip install pyopenssl
 pip install pyzmail
 pip install pyzmail35
-`
+```
+
+
+
