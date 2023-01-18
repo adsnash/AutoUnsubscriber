@@ -20,7 +20,7 @@ pip install os-sys
 pip install syspath
 pip install pyopenssl
 pip install pyzmail
-pip install pyzmail35
+pip install pyzmail39
 ```
 
 
